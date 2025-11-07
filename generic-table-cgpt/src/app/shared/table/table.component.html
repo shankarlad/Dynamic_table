@@ -1,0 +1,40 @@
+<div class="search-bar">
+  <input [(ngModel)]="searchTerm" placeholder="Search..." />
+</div>
+
+<div class="column-toggle">
+  <label *ngFor="let header of headers">
+    <input type="checkbox" [checked]="visibleColumns.includes(header.key)" (change)="toggleColumn(header.key)" />
+    {{ header.label }}
+  </label>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <ng-container *ngFor="let header of headers">
+        <th *ngIf="visibleColumns.includes(header.key)" (click)="changeSort(header.key)">
+          {{ header.label }}
+          <span *ngIf="sortColumn === header.key">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        </th>
+      </ng-container>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of paginatedData">
+      <ng-container *ngFor="let header of headers">
+        <td *ngIf="visibleColumns.includes(header.key)">
+          {{ row[header.key] }}
+        </td>
+      </ng-container>
+    </tr>
+  </tbody>
+</table>
+
+<div class="pagination">
+  <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Prev</button>
+  <span>Page {{ currentPage }} of {{ totalPages() }}</span>
+  <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages()">Next</button>
+</div>
