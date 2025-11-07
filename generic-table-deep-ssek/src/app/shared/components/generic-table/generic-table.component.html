@@ -1,0 +1,59 @@
+<div class="table-container">
+  <!-- Column selector -->
+  <div class="column-selector" *ngIf="showColumnSelector">
+    <h4>Visible Columns</h4>
+    <div *ngFor="let column of columns" class="column-checkbox">
+      <label>
+        <input type="checkbox" 
+               [checked]="column.visible !== false" 
+               (change)="toggleColumnVisibility(column)">
+        {{ column.title }}
+      </label>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="generic-table">
+      <thead>
+        <tr>
+          <th *ngFor="let column of visibleColumns" 
+              [style.width]="column.width || 'auto'"
+              (click)="column.sortable !== false ? onSort(column.key) : null"
+              [class.sortable]="column.sortable !== false"
+              [class.sorted]="sortColumn === column.key">
+            {{ column.title }}
+            <span *ngIf="sortColumn === column.key" class="sort-icon">
+              {{ sortDirection === 'asc' ? '↑' : '↓' }}
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredData" (click)="onRowClick(item)">
+          <td *ngFor="let column of visibleColumns">
+            {{ item[column.key] }}
+          </td>
+        </tr>
+        <tr *ngIf="filteredData.length === 0">
+          <td [attr.colspan]="visibleColumns.length" class="no-data">No data available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button (click)="onPageChange(1)" [disabled]="currentPage === 1">First</button>
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+    
+    <span *ngFor="let page of getPageNumbers()" 
+          (click)="onPageChange(page)"
+          [class.active]="page === currentPage">
+      {{ page }}
+    </span>
+    
+    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+    <button (click)="onPageChange(totalPages)" [disabled]="currentPage === totalPages">Last</button>
+  </div>
+</div>

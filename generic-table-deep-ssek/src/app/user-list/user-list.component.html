@@ -1,0 +1,18 @@
+<h2>User Management</h2>
+
+<div class="search-container">
+  <input type="text" 
+         [(ngModel)]="searchTerm" 
+         placeholder="Search users..."
+         class="search-input">
+</div>
+
+<app-generic-table 
+  [data]="users"
+  [columns]="columns"
+  [pageSize]="pageSize"
+  [searchTerm]="searchTerm"
+  [showColumnSelector]="true"
+  (sortChanged)="onSort($event)"
+  (rowClicked)="onRowClick($event)">
+</app-generic-table>
