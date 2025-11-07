@@ -1,0 +1,117 @@
+<!-- src/app/components/generic-table/generic-table.component.html -->
+<div class="generic-table-container">
+  <!-- Search and Column Visibility Controls -->
+  <div class="table-controls">
+    <div class="search-container" *ngIf="config.searching && config.searching.enabled">
+      <input 
+        type="text" 
+        class="search-input"
+        [placeholder]="config.searching.placeholder || 'Search...'"
+        (input)="onSearch($event)">
+    </div>
+    
+    <div class="column-visibility">
+      <button class="column-toggle-btn" type="button">
+        Columns ▼
+      </button>
+      <div class="column-dropdown">
+        <label *ngFor="let column of availableColumns" class="column-checkbox">
+          <input 
+            type="checkbox" 
+            [checked]="column.visible === true"
+            (change)="toggleColumnVisibility(column)">
+          {{ column.header }}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+    <table class="generic-table">
+      <thead>
+        <tr>
+          <th *ngFor="let column of visibleColumns" 
+              [class.sortable]="column.sortable"
+              [style.width]="column.width"
+              (click)="onSort(column)">
+            {{ column.header }}
+            <span class="sort-indicator" *ngIf="column.sortable">
+              {{ getSortIcon(column) }}
+            </span>
+          </th>
+          <th *ngIf="config.actions" class="actions-column">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of paginatedData" class="table-row">
+          <td *ngFor="let column of visibleColumns" [attr.data-label]="column.header">
+            {{ formatCellValue(row[column.key], column) }}
+          </td>
+          <td *ngIf="config.actions" class="actions-cell">
+            <button *ngIf="config.actions.view" 
+                    class="action-btn view-btn"
+                    (click)="onAction('view', row)">
+              👁️
+            </button>
+            <button *ngIf="config.actions.edit" 
+                    class="action-btn edit-btn"
+                    (click)="onAction('edit', row)">
+              ✏️
+            </button>
+            <button *ngIf="config.actions.delete" 
+                    class="action-btn delete-btn"
+                    (click)="onAction('delete', row)">
+              🗑️
+            </button>
+            <button *ngFor="let customAction of config.actions.custom"
+                    class="action-btn custom-btn"
+                    (click)="onAction(customAction.action, row)">
+              {{ customAction.icon || customAction.label }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container" *ngIf="config.pagination && config.pagination.enabled">
+    <div class="pagination-info">
+      <span>
+        Showing {{ (currentPage - 1) * config.pagination.pageSize + 1 }} to 
+        {{ getMinValue(currentPage * config.pagination.pageSize, filteredData.length) }} 
+        of {{ filteredData.length }} entries
+      </span>
+      
+      <select class="page-size-select" 
+              [value]="config.pagination.pageSize"
+              (change)="onPageSizeChange($event)">
+        <option *ngFor="let size of config.pagination.pageSizeOptions" [value]="size">
+          {{ size }} per page
+        </option>
+      </select>
+    </div>
+    
+    <div class="pagination-controls">
+      <button class="page-btn" 
+              [disabled]="currentPage === 1"
+              (click)="onPageChange(currentPage - 1)">
+        Previous
+      </button>
+      
+      <button *ngFor="let page of getPageNumbers()" 
+              class="page-btn"
+              [class.active]="page === currentPage"
+              (click)="onPageChange(page)">
+        {{ page }}
+      </button>
+      
+      <button class="page-btn" 
+              [disabled]="currentPage === totalPages"
+              (click)="onPageChange(currentPage + 1)">
+        Next
+      </button>
+    </div>
+  </div>
+</div>
